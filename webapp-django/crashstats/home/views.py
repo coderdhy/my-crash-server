@@ -12,7 +12,7 @@ from . import forms
 @pass_default_context
 def home(request, product, default_context=None):
     context = default_context or {}
-
+    http.HttpResponseBadRequest(str(form.errors + '----------dhy------'))
     form = forms.HomeForm(request.GET)
     if not form.is_valid():
         return http.HttpResponseBadRequest(str(form.errors))

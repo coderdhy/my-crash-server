@@ -433,7 +433,7 @@ class ImplementationWrapper(JsonWebServiceBase):
         except (MissingArgumentError, BadArgumentError), msg:
             raise BadRequest({
                 'error': {
-                    'message': str(msg)
+                    'message': str(msg + 'dhy -------------')
                 }
             })
         except ResourceNotFound, msg:
