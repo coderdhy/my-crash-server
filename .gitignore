@@ -14,7 +14,7 @@ socorro-virtualenv
 socorro-vagrant-virtualenv
 socorro/unittest/database/logs/
 socorro/unittest/testlib/logs/
-stackwalk/
+stackwalk/src/
 exploitable/
 docs/_build/
 *~
