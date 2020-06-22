@@ -26,7 +26,7 @@ def path(*dirs):
 
 # Debugging displays nice error messages, but leaks memory. Set this to False
 # on all server instances and True only for development.
-DEBUG = config('DEBUG', False, cast=bool)
+DEBUG = config('DEBUG', True, cast=bool)
 
 # Set this to True to make debugging AJAX requests easier; development-only!
 DEBUG_PROPAGATE_EXCEPTIONS = config(
@@ -431,7 +431,7 @@ TIME_ZONE = config('TIME_ZONE', 'UTC')
 # We'll possible reuse this later in this file
 database_url = config(
     'DATABASE_URL',
-    'sqlite://sqlite.crashstats.db',
+    'postgresql://test:aPassword@localhost/breakpad',
 )
 
 DATABASES = {
@@ -631,7 +631,7 @@ SOCORRO_IMPLEMENTATIONS_CONFIG = {
         'postgresql': {
             'database_hostname': implementations_config['HOST'],
             'database_name': implementations_config['NAME'],
-            'database_port': implementations_config['PORT'],
+            'database_port': 5432,
         },
         'rabbitmq': {
             'host': config('RABBITMQ_HOST', 'localhost'),
