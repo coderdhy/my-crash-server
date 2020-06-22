@@ -457,11 +457,11 @@ class App(SocorroApp):
         reference_value_from='resource.logging',
     )
     required_config.logging.add_option(
-        'filelog_format_string',
-        doc='python logging system format for file entries',
-        default='{app_name} (pid {process}): '
-                '{asctime} {levelname} - {threadName} - '
-                '{message}',
+        'filelog_level',
+        doc='logging level for the logging to stderr (10 - '
+            'DEBUG, 20 - INFO, 30 - WARNING, 40 - ERROR, '
+            '50 - CRITICAL)',
+        default=10,
         reference_value_from='resource.logging',
     )
     required_config.logging.add_option(
