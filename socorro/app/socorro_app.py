@@ -379,7 +379,7 @@ def setup_logger(config, local_unused, args_unused):
     logger.addHandler(syslog)
 
     log_path = config.logging.filelog_path + app_name + ".log"
-    fileLog = logging.FileHandler(config.logging.filelog_path)
+    fileLog = logging.FileHandler(log_path)
     fileLog.setLevel(config.logging.filelog_level)
     fileLog_format = config.logging.filelog_format_string.replace(
         '{app_name}',
