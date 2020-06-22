@@ -378,6 +378,19 @@ def setup_logger(config, local_unused, args_unused):
     syslog.setFormatter(syslog_formatter)
     logger.addHandler(syslog)
 
+    log_path = config.logging.filelog_path + app_name + ".log"
+    fileLog = logging.FileHandler(config.logging.filelog_path)
+    fileLog.setLevel(config.logging.filelog_level)
+    fileLog_format = config.logging.filelog_format_string.replace(
+        '{app_name}',
+        app_name
+    )
+    file_log_formatter = logging.Formatter(
+        _convert_format_string(fileLog_format)
+    )
+    fileLog.setFormatter(file_log_formatter)
+    logger.addHandler(fileLog)
+
     wrapped_logger = LoggerWrapper(logger, config)
     return wrapped_logger
 
@@ -435,7 +448,28 @@ class App(SocorroApp):
         default=10,
         reference_value_from='resource.logging',
     )
-
+    required_config.logging.add_option(
+        'filelog_format_string',
+        doc='python logging system format for file entries',
+        default='{app_name} (pid {process}): '
+                '{asctime} {levelname} - {threadName} - '
+                '{message}',
+        reference_value_from='resource.logging',
+    )
+    required_config.logging.add_option(
+        'filelog_format_string',
+        doc='python logging system format for file entries',
+        default='{app_name} (pid {process}): '
+                '{asctime} {levelname} - {threadName} - '
+                '{message}',
+        reference_value_from='resource.logging',
+    )
+    required_config.logging.add_option(
+        'filelog_path',
+        doc='logging path',
+        default='./',
+        reference_value_from='resource.logging',
+    )
     required_config.add_aggregation(
         'logger',
         setup_logger
