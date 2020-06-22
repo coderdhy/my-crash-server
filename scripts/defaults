@@ -1,6 +1,6 @@
 echo "this is the file defaults"
 
-export PYTHON=${PYTHON:-"python2"}
+export PYTHON=${PYTHON:-"python"}
 export VIRTUAL_ENV=${VIRTUAL_ENV:-"$PWD/socorro-virtualenv"}
 export BUILD_TYPE=${BUILD_TYPE:-"tar"}
 export BUILD_DIR=${BUILD_DIR:-"build/$BUILD_TYPE/socorro"}

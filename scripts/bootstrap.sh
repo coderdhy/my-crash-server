@@ -21,23 +21,25 @@ if [ -n "${SOCORRO_DEVELOPMENT_ENV+1}" ]; then
     ${VIRTUAL_ENV}/bin/python setup.py develop
 fi
 
-if [ "`uname -sm`" == "Linux x86_64" ]; then
+# @donghongyue 已经把编译好的二进制文件放到stackwalk目录下，不需要再走源码编译了，源码编译需要翻墙
+
+#if [ "`uname -sm`" == "Linux x86_64" ]; then
   # pull pre-built, known version of breakpad
-  wget -N --quiet 'http://10.155.29.83/python/breakpad.tar.gz'
-  tar -zxf breakpad.tar.gz
-  rm -rf stackwalk
-  mv breakpad stackwalk
-else
+#  wget -N --quiet 'http://10.155.29.83/python/breakpad.tar.gz'
+#  tar -zxf breakpad.tar.gz
+#  rm -rf stackwalk
+#  mv breakpad stackwalk
+#else
   # build breakpad from source
-  make breakpad
-fi
+#  make breakpad
+#fi
 # Build JSON stackwalker and friends
-pushd minidump-stackwalk
-make
-popd
-cp minidump-stackwalk/stackwalker stackwalk/bin
-cp minidump-stackwalk/jit-crash-categorize stackwalk/bin
-cp minidump-stackwalk/dumplookup stackwalk/bin
+#pushd minidump-stackwalk
+#make
+#popd
+#cp minidump-stackwalk/stackwalker stackwalk/bin
+#cp minidump-stackwalk/jit-crash-categorize stackwalk/bin
+#cp minidump-stackwalk/dumplookup stackwalk/bin
 
 # setup any unset test configs and databases without overwriting existing files
 pushd config
