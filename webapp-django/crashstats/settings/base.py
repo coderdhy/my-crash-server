@@ -54,7 +54,7 @@ STATIC_ROOT = path('static')
 STATIC_URL = '/static/'
 
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', '', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', '*', cast=Csv())
 
 
 # Name of the top-level module where you put all your apps.
