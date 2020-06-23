@@ -497,7 +497,7 @@ CEF_VENDOR = config('CEF_VENDOR', 'Mozilla')
 
 # If you intend to run WITHOUT HTTPS, such as local development,
 # then set this to False
-SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', True, cast=bool)
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', False, cast=bool)
 
 # By default, use HTTPONLY cookies
 SESSION_COOKIE_HTTPONLY = config('SESSION_COOKIE_HTTPONLY', True, cast=bool)
