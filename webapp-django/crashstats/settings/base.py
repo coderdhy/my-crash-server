@@ -360,7 +360,7 @@ SOUTH_TESTS_MIGRATE = False
 
 # Recipients of traceback emails and other notifications.
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
+    ('socorro', 'socorro@xdf.com')
 )
 MANAGERS = ADMINS
 
