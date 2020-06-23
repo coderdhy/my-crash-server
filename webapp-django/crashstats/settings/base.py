@@ -256,7 +256,7 @@ SIMPLE_SEARCH_FIELDS = (
     'product',
     'version',
     'platform',
-    'process_type',
+    'ptype',
 )
 
 # the number of result filter on tcbs
@@ -640,7 +640,7 @@ SOCORRO_IMPLEMENTATIONS_CONFIG = {
         },
         'boto': {
             'access_key': config('resource.boto.access_key', None),
-            'bucket_name': config(
+            '': config(
                 'resource.boto.bucket_name', 'crashstats'),
             'prefix': config('resource.boto.prefix', ''),
             'keybuilder_class': config(

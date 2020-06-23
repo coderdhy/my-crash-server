@@ -248,6 +248,7 @@ class CSignatureToolBase(SignatureTool):
 
         # Get all the relevant frame signatures.
         new_signature_list = []
+        vkkeys = ['chinook','qoe','semino','vipkidsdk','::','VIPKID','enginesdk','mediaengine','rtc','agora','cef','chromium','liteav','st_mobile']
         for a_signature in source_list:
             # If the signature matches the irrelevant signatures regex,
             # skip to the next frame.
@@ -267,12 +268,24 @@ class CSignatureToolBase(SignatureTool):
                 ):
                     continue
 
-            new_signature_list.append(a_signature)
+            #new_signature_list.append(a_signature)
 
             # If the signature does not match the prefix signatures regex,
             # then it is the last one we add to the list.
-            if not self.prefix_signature_re.match(a_signature):
+            #if not self.prefix_signature_re.match(a_signature):
+            #    break
+            l_sig = a_signature.lower()
+            findvkkey = False
+            for vkkey in vkkeys:
+                if l_sig.find(vkkey) != -1:
+                    findvkkey = True
+                    break
+            if findvkkey == True:
+                new_signature_list.append(a_signature)
                 break
+
+        if len(new_signature_list) == 0 and len(source_list) > 0:
+            new_signature_list.append(source_list[0])
 
         # Add a special marker for hang crash reports.
         if hang_type:

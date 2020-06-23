@@ -61,7 +61,7 @@ urlpatterns = patterns(
     # it will make it very hard to ever change the DEFAULT_PRODUCT
     url(r'^$',
         RedirectView.as_view(
-            url='/home/product/%s' % settings.DEFAULT_PRODUCT,
+            url='/search/?_dont_run=1',
             permanent=False  # this is not a legacy URL
         )),
 

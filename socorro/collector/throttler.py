@@ -189,10 +189,20 @@ class LegacyThrottler(RequiredConfig):
                 )
                 return DISCARD, percentage
             else:
+                if raw_crash.has_key('product'):
+                    procname = raw_crash.product
+                else:
+                    procname = raw_crash.ProductName
+                if raw_crash.has_key('version'):
+                    version = raw_crash.version
+                else:
+                    version = raw_crash.Version
+
+
                 self.config.logger.debug(
                   "deferring %s %s",
-                  raw_crash.ProductName,
-                  raw_crash.Version
+                  procname,
+                  version
                 )
                 return DEFER, percentage
         else:  # we're accepting

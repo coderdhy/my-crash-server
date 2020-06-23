@@ -59,7 +59,7 @@ class BreakpadStackwalkerRule(Rule):
         'processor_symbols_pathname_list',
         doc='comma or space separated list of symbol files for '
         'minidump_stackwalk (quote paths with embedded spaces)',
-        default='/home/socorro/symbols',
+        default='./symbols',
         from_string_converter=_create_symbol_path_str
     )
     required_config.add_option(

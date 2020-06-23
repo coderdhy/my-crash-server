@@ -91,7 +91,7 @@ class SearchBase(object):
             '_aggs.android_cpu_abi.android_manufacturer.android_model'
         ),
         SearchFilter('_columns', default=[
-            'uuid', 'date', 'signature', 'product', 'version'
+            'uuid', 'date', 'signature', 'product', 'version', 'platform', 'platform_version'
         ]),
         SearchFilter('_facets', default='signature'),
         SearchFilter('_facets_size', data_type='int', default=50),

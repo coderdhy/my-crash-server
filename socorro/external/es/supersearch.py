@@ -118,10 +118,12 @@ class SuperSearch(SearchBase):
         try:
             field_ = self.all_fields[value]
         except KeyError:
-            raise BadArgumentError(
-                value,
-                msg='Unknown field "%s"' % value
-            )
+            return ''
+            #raise BadArgumentError(
+             #   value,
+              #  msg='Unknown field "%s"' % value
+            #)
+
 
         if not field_['is_returned']:
             # Returning this field is not allowed.

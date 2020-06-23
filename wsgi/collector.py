@@ -1,6 +1,7 @@
 import os
-from socorro.app.socorro_app import (
-    SocorroWelcomeApp,
+
+from socorro.collector.collector_app import (
+    CollectorApp,
     main
 )
 from socorro.webapi.servers import WSGIServer
@@ -15,14 +16,14 @@ if os.path.isfile('/etc/socorro/collector.ini'):
     config_path = '/etc/socorro'
 else:
     config_path = WSGIServer.get_socorro_config_path(__file__)
-
+print config_path
 # invoke the generic main function to create the configman app class and which
 # will then create the wsgi app object.
 main(
     # we use the generic Socorro App class. We'll rely on configuration to set
     # the 'application' class object to the appropriate collector_app class
     # for example, it could be "CollectorApp" or "Collector2015App"
-    SocorroWelcomeApp,
+    CollectorApp,
     config_path=config_path,
     values_source_list=[
         ConfigFileFutureProxy,

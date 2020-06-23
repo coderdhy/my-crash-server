@@ -31,6 +31,12 @@
                 class="google-signin-help">Google Sign-In Help</a>
             documentation.
         </p>
+        <form action="/oauth2/signin/" method="post">
+    　　  {% csrf_token %}
+            <p>姓名：<input type="text" name="user"></p>
+            <p>密码：<input type="password" name="pwd"></p>
+            <input type="submit" value="提交">
+        </form>
     {% endif %}
     </div>
 </div>

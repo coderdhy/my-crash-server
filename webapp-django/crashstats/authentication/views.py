@@ -15,7 +15,7 @@ from django.utils.encoding import smart_bytes
 from oauth2client import client, crypt
 
 from crashstats.crashstats.utils import json_view
-
+from django.views.decorators.csrf import csrf_exempt
 
 User = get_user_model()
 
@@ -65,17 +65,20 @@ def oauth2_signout(request):
     if not request.user.is_authenticated():
         return redirect('/')
 
-    if request.method == 'POST':
-        auth.logout(request)
-        return {'OK': True}
+    #if request.method == 'POST':
+    auth.logout(request)
+    return {'OK': True}
 
-    return render(request, 'auth/signout.html')
+    #return render(request, 'auth/signout.html')
 
 
 @require_POST
 @json_view
+@csrf_exempt
 def oauth2_signin(request):
+    '''
     token = request.POST['token']
+
     try:
         idinfo = client.verify_id_token(
             token,
@@ -85,7 +88,7 @@ def oauth2_signin(request):
         return http.HttpResponseForbidden(
             'Invalid Identity token'
         )
-
+    
     if idinfo['aud'] != settings.OAUTH2_CLIENT_ID:
         return http.HttpResponseForbidden(
             'Invalid Client ID ({})'.format(idinfo['aud'])
@@ -98,40 +101,29 @@ def oauth2_signin(request):
         return http.HttpResponseForbidden(
             'Email not verified'
         )
+    '''
+
     # log in the user
     try:
-        user = User.objects.get(email__iexact=idinfo['email'])
+        user = request.POST.get("user")
+        pwd = request.POST.get("pwd")
+        user = User.objects.get(username__iexact=user)
         if not user.is_active:
             return http.HttpResponseForbidden(
                 'Inactivated user'
             )
         # We already had a user by that email address, but if the
         # first or last name is different, override what we already had.
-        if (
-            idinfo.get('given_name') is not None and
-            user.first_name != idinfo['given_name']
-        ):
-            user.first_name = idinfo['given_name']
-            user.save()
-        if (
-            idinfo.get('family_name') is not None and
-            user.last_name != idinfo['family_name']
-        ):
-            user.last_name = idinfo['family_name']
-            user.save()
+
     except User.DoesNotExist:
-        user = User.objects.create(
-            username=default_username(idinfo['email']),
-            email=idinfo['email'],
-            first_name=idinfo.get('given_name', ''),
-            last_name=idinfo.get('family_name', ''),
-        )
+        return {'error': False}
+
     user.backend = 'django.contrib.auth.backends.ModelBackend'
     request.user = user
     auth.login(request, user)
 
     # Make a note that we used Google to sign in.
     # This is helpful for the sake of how we present the sign-out link.
-    request.session['signin_method'] = 'google'
+    request.session['signin_method'] = 'socorro'
 
-    return {'OK': True}
+    return redirect('/admin')

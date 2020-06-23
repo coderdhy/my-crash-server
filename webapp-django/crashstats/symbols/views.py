@@ -16,11 +16,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.db import transaction
+import random
+import string
 from django.core.exceptions import ImproperlyConfigured
 
 import boto
 import boto.s3.connection
 import boto.exception
+
+import zipfile
 
 from crashstats.crashstats.decorators import login_required
 from crashstats.tokens.models import Token
@@ -56,95 +60,13 @@ def check_symbols_archive_content(content):
 
 
 def unpack_and_upload(iterator, symbols_upload, bucket_name, bucket_location):
-    necessary_setting_keys = (
-        'SYMBOLS_BUCKET_DEFAULT_LOCATION',
-        'SYMBOLS_BUCKET_DEFAULT_NAME',
-        'SYMBOLS_FILE_PREFIX',
-    )
-    for key in necessary_setting_keys:
-        if not getattr(settings, key):
-            raise ImproperlyConfigured(
-                "Setting %s must be set" % key
-            )
+    destination = open('../symbols/1.zip', 'wb+')
+    f = iterator.gi_frame.f_locals.file_object
+    for chunk in f.chunks():
+        destination.write(chunk)
+    destination.close()
 
-    conn = boto.s3.connect_to_region(
-        bucket_location,
-        aws_access_key_id=settings.AWS_ACCESS_KEY,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        calling_format=boto.s3.connection.OrdinaryCallingFormat(),
-    )
-    assert bucket_name
-
-    bucket = conn.lookup(bucket_name)
-    if bucket is None:
-        try:
-            bucket = conn.create_bucket(bucket_name, location=bucket_location)
-        except AttributeError as exception:
-            # This extra exception trap is temporary until we can figure
-            # out why sometimes we get AttributeErrors here.
-            raise AttributeError(
-                '%s (bucket_name=%r, bucket_location=%r)' % (
-                    exception, bucket_name, bucket_location
-                )
-            )
-
-    total_uploaded = 0
-    for member in iterator:
-        key_name = os.path.join(
-            settings.SYMBOLS_FILE_PREFIX, member.name
-        )
-        key = bucket.get_key(key_name)
-
-        # let's assume first that we need to add a new key
-        prefix = '+'
-        if key:
-            # key already exists, but is it the same size?
-            if key.size != member.size:
-                # file size in S3 is different, upload the new one
-                key = None
-            else:
-                prefix = '='
-
-        if not key:
-            key = bucket.new_key(key_name)
-
-            file = StringIO()
-            file.write(member.extractor().read())
-
-            content_type = mimetypes.guess_type(key_name)[0]  # default guess
-            for ext in settings.SYMBOLS_MIME_OVERRIDES:
-                if key_name.lower().endswith('.{0}'.format(ext)):
-                    content_type = settings.SYMBOLS_MIME_OVERRIDES[ext]
-                    key.content_type = content_type
-                    symbols_upload.content_type = key.content_type
-
-            compress = False
-            for ext in settings.SYMBOLS_COMPRESS_EXTENSIONS:
-                if key_name.lower().endswith('.{0}'.format(ext)):
-                    compress = True
-                    break
-            headers = {
-                'Content-Type': content_type,
-            }
-            if compress:
-                headers['Content-Encoding'] = 'gzip'
-                out = StringIO()
-                with gzip.GzipFile(fileobj=out, mode='w') as f:
-                    f.write(file.getvalue())
-                value = out.getvalue()
-            else:
-                value = file.getvalue()
-            uploaded = key.set_contents_from_string(value, headers)
-            total_uploaded += uploaded
-
-        symbols_upload.content += '%s%s,%s\n' % (
-            prefix,
-            key.bucket.name,
-            key.key
-        )
-        symbols_upload.save()
-
-    return total_uploaded
+    return ''
 
 
 def get_bucket_name_and_location(user):
@@ -223,18 +145,20 @@ def web_upload(request):
                 filename=os.path.basename(form.cleaned_data['file'].name),
             )
             form.cleaned_data['file'].file.seek(0)
-            bucket_name, bucket_location = get_bucket_name_and_location(
-                request.user
-            )
-            unpack_and_upload(
-                utils.get_archive_members(
-                    form.cleaned_data['file'].file,
-                    form.cleaned_data['file'].name
-                ),
-                symbols_upload,
-                bucket_name,
-                bucket_location
-            )
+            random_name = "".join(random.sample(string.ascii_letters + string.digits, 8))
+            save_path = '../symbols/'+random_name+'.zip'
+            destination = open(save_path, 'wb+')
+            f = request.FILES['file']
+            for chunk in f.chunks():
+                destination.write(chunk)
+            destination.close()
+
+            zip = zipfile.ZipFile(save_path, 'r')
+            for item in zip.namelist():
+                zip.extract(item, "../symbols/")
+
+            os.remove(save_path)
+
             messages.success(
                 request,
                 '%s bytes of %s uploaded.' % (

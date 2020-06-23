@@ -117,6 +117,8 @@ class GenericCollectorBase(RequiredConfig):
                     self.checksum_method(value.value).hexdigest()
             elif isinstance(value, int):
                 raw_crash[name] = value
+            elif isinstance(value,list):
+                raw_crash[name] = value[0]
             else:
                 raw_crash[name] = value.value
         return raw_crash, dumps

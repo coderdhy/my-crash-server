@@ -157,11 +157,15 @@ class PostgreSQLBasicCrashStorage(CrashStorageBase):
         ):
             column_list.append(report_name)
             placeholder_list.append('%s')
-            value = processed_crash[pro_crash_name]
-            if isinstance(value, basestring) and length:
+            try:
+                value = processed_crash[pro_crash_name]
+                if isinstance(value, basestring) and length:
                     value_list.append(value[:length])
-            else:
-                value_list.append(value)
+                else:
+                    value_list.append(value)
+            except Exception,x:
+                value_list.append(None)
+                continue
 
         def print_eq(a, b):
             # Helper for UPDATE SQL clause
@@ -223,7 +227,10 @@ class PostgreSQLBasicCrashStorage(CrashStorageBase):
             plugin - When set to plugin, the jsonDocument MUST calso contain
                      PluginFilename, PluginName, and PluginVersion
         """
-        process_type = processed_crash['process_type']
+        try:
+            process_type = processed_crash['process_type']
+        except:
+            return
         if not process_type:
             return
 

@@ -39,7 +39,7 @@ class RabbitMQCrashStorage(CrashStorageBase):
     transactional semantics using the TransactorExecutor classes.  The
     'new_crashes' generator has a lower level relationship with the
     underlying connection object"""
-
+    print 'rabbitmq begin'
     required_config = Namespace()
     required_config.add_option(
         'rabbitmq_class',
@@ -75,7 +75,7 @@ class RabbitMQCrashStorage(CrashStorageBase):
         doc='percentage of the time that rabbit will try to queue',
         reference_value_from='resource.rabbitmq',
     )
-
+    print 'rabbitmq end'
     #--------------------------------------------------------------------------
     def __init__(self, config, quit_check_callback=None):
         super(RabbitMQCrashStorage, self).__init__(
@@ -111,6 +111,7 @@ class RabbitMQCrashStorage(CrashStorageBase):
 
     #--------------------------------------------------------------------------
     def save_raw_crash(self, raw_crash, dumps, crash_id):
+        print('rabbitmq save_raw_crash')
         if self.dont_queue_this_crash():
             self.config.logger.info(
                 'Crash %s filtered out of RabbitMQ queue %s',
@@ -144,6 +145,7 @@ class RabbitMQCrashStorage(CrashStorageBase):
 
     #--------------------------------------------------------------------------
     def _save_raw_crash_transaction(self, connection, crash_id):
+        print('rabbitmq _save_raw_crash_transaction')
         connection.channel.basic_publish(
             exchange='',
             routing_key=self.config.routing_key,
@@ -275,6 +277,7 @@ class RabbitMQCrashStorage(CrashStorageBase):
         crash_id,
         acknowledgement_token
     ):
+        print('rabbitmq _transaction_ack_crash')
         connection.channel.basic_ack(
             delivery_tag=acknowledgement_token.delivery_tag
         )

@@ -238,6 +238,17 @@ class Processor2015(RequiredConfig):
 
             # the crash made it through the processor rules with no exceptions
             # raised, call it a success.
+            try:
+                version = raw_crash.version
+                processed_crash.version = version
+                processed_crash.process_type = raw_crash.ptype
+                processed_crash.product = raw_crash.product
+                processed_crash.os_name = raw_crash.platform
+                #processed_crash.os_version = raw_crash.platform
+            except:
+                processed_crash.version = raw_crash.Version
+
+
             processed_crash.success = True
 
         except Exception, x:

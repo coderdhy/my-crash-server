@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from socorro.external.crash_data_base import CrashDataBase
-
+from socorro.external.fs.crashstorage import FSLegacyRadixTreeStorage
 
 class CrashData(CrashDataBase):
 
@@ -12,4 +12,5 @@ class CrashData(CrashDataBase):
     """
 
     def get_storage(self):
-        return self.config.filesystem.filesystem_class(self.config.filesystem)
+        return FSLegacyRadixTreeStorage(self.config,None)
+        #return self.config.filesystem.filesystem_class(self.config.filesystem)

@@ -30,7 +30,8 @@ import socorro.external.postgresql.signature_first_date
 import socorro.external.postgresql.server_status
 import socorro.external.postgresql.releases
 import socorro.external.boto.crash_data
-
+import socorro.external.fs.crash_data
+import socorro.external.crashstorage_base
 from socorro.app import socorro_app
 
 from django.conf import settings
@@ -83,8 +84,59 @@ def config_from_configman():
     definition_source.namespace('data')
     definition_source.data.add_option(
         'crash_data_class',
-        default=socorro.external.boto.crash_data.SimplifiedCrashData,
+        default=socorro.external.fs.crash_data.CrashData,
     )
+    definition_source.data.add_option(
+        'redactor_class',
+        default=socorro.external.crashstorage_base.Redactor,
+    )
+    definition_source.data.add_option(
+        'umask',
+        default=0o022,
+    )
+    definition_source.data.add_option(
+        'name_branch_base',
+        doc='the directory base name to use for the named radix tree storage',
+        default='name',
+        reference_value_from='resource.fs',
+    )
+    definition_source.data.add_option(
+        'fs_root',
+        doc='a path to a file system',
+        default='../crashes',
+
+        # We strip / from the right so we can consistently use os.sep.join
+        # instead of os.path.join (which is faster).
+        from_string_converter=lambda x: x.rstrip('/'),
+        reference_value_from='resource.fs',
+    )
+    definition_source.data.add_option(
+        'json_file_suffix',
+        doc='the suffix used to identify a json file',
+        default='.json',
+        reference_value_from='resource.fs',
+    )
+    definition_source.data.add_option(
+        'jsonz_file_suffix',
+        doc='the suffix used to identify a gzipped json file',
+        default='.jsonz',
+        reference_value_from='resource.fs',
+    )
+    definition_source.data.add_option(
+        'dump_file_suffix',
+        doc='the suffix used to identify a dump file',
+        default='.dump',
+        reference_value_from='resource.fs',
+    )
+    definition_source.data.add_option(
+        'dump_field',
+        doc='the default dump field',
+        default='upload_file_minidump',
+        reference_value_from='resource.fs',
+    )
+
+    definition_source.namespace('redactor_class')
+    definition_source.redactor_class = socorro.external.crashstorage_base.Redactor
     config = configuration(
         definition_source=definition_source,
         values_source_list=[
@@ -267,7 +319,7 @@ class SocorroCommon(object):
                     logger.debug(
                         "CACHE HIT %s" % implementation.__class__.__name__
                     )
-                    return result, True
+                    #return result, True jyjtodo
 
         implementation_method = getattr(implementation, method)
         result = implementation_method(**params)
@@ -573,7 +625,8 @@ class Platforms(SocorroMiddleware):
 
 class ProcessedCrash(SocorroMiddleware):
 
-    implementation = socorro.external.boto.crash_data.SimplifiedCrashData
+    #implementation = socorro.external.boto.crash_data.SimplifiedCrashData
+    implementation = socorro.external.fs.crash_data.CrashData
     implementation_config_namespace = 'data'
 
     required_params = (
@@ -686,7 +739,7 @@ class RawCrash(SocorroMiddleware):
     token that carries the "View Raw Dumps" permission.
     """
 
-    implementation = socorro.external.boto.crash_data.SimplifiedCrashData
+    implementation = socorro.external.fs.crash_data.CrashData
     implementation_config_namespace = 'data'
 
     required_params = (

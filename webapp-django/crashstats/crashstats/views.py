@@ -30,6 +30,10 @@ from crashstats.supersearch.models import (
     SuperSearchUnredacted
 )
 
+from django.shortcuts import render,HttpResponse,redirect
+
+from django.contrib.auth.decorators import login_required
+from django.contrib import auth
 
 # To prevent running in to a known Python bug
 # (http://bugs.python.org/issue7980)
@@ -880,13 +884,102 @@ def report_index(request, crash_id, default_context=None):
     context['bug_product_map'] = settings.BUG_PRODUCT_MAP
 
     process_type = 'unknown'
-    if context['report']['process_type'] is None:
-        process_type = 'browser'
-    elif context['report']['process_type'] == 'plugin':
-        process_type = 'plugin'
-    elif context['report']['process_type'] == 'content':
-        process_type = 'content'
+    try:
+        if context['report']['process_type'] is None:
+            process_type = 'browser'
+        elif context['report']['process_type'] == 'plugin':
+            process_type = 'plugin'
+        elif context['report']['process_type'] == 'content':
+            process_type = 'content'
+    except:
+        context['report']['process_type'] = 'none'
+        print 'hehe'
     context['process_type'] = process_type
+    context['report']['product'] = context['product']
+    if not context['report'].has_key('version'):
+        context['report']['version'] = context['raw']['version']
+    if not context['report'].has_key('os_name'):
+        context['report']['os_name'] = 'none'
+    if not context['report'].has_key('os_pretty_version'):
+        context['report']['os_pretty_version'] = 'none'
+    if not context['report'].has_key('os_version'):
+        context['report']['os_version'] = 'none'
+    if not context['report'].has_key('release_channel'):
+        context['report']['release_channel'] = 'none'
+    if not context['raw'].has_key('InstallTime'):
+        context['raw']['InstallTime'] = 'none'
+    if not context['raw'].has_key('Android_Version'):
+        context['raw']['Android_Version'] = 'none'
+    if not context['raw'].has_key('B2G_OS_Version'):
+        context['raw']['B2G_OS_Version'] = 'none'
+    if not context['report'].has_key('cpu_name'):
+        context['report']['cpu_name'] = 'none'
+    if not context['report'].has_key('cpu_info'):
+        context['report']['cpu_info'] = 'none'
+    if not context['report'].has_key('build'):
+        context['report']['build'] = 'none'
+    if not context['report'].has_key('PluginName'):
+        context['report']['PluginName'] = 'none'
+    if not context['report'].has_key('PluginVersion'):
+        context['report']['PluginVersion'] = 'none'
+    if not context['report'].has_key('PluginFilename'):
+        context['report']['PluginFilename'] = 'none'
+    if not context['report'].has_key('exploitability'):
+        context['report']['exploitability'] = 'none'
+    if not context['report'].has_key('user_comments'):
+        context['report']['user_comments'] = 'none'
+    if not context['report'].has_key('addons_checked'):
+        context['report']['addons_checked'] = 'none'
+    if not context['report'].has_key('app_notes'):
+        context['report']['app_notes'] = 'none'
+    if not context['report'].has_key('addons'):
+        context['report']['addons'] = 'none'
+
+    if not context['parsed_dump'].has_key('modules'):
+        context['parsed_dump']['modules'] = 'none'
+
+
+
+    if not context['raw'].has_key('Android_Manufacturer'):
+        context['raw']['Android_Manufacturer'] = 'none'
+    if not context['raw'].has_key('Android_Model'):
+        context['raw']['Android_Model'] = 'none'
+    if not context['raw'].has_key('Android_CPU_ABI'):
+        context['raw']['Android_CPU_ABI'] = 'none'
+
+    if not context['raw'].has_key('AdapterVendorID'):
+        context['raw']['AdapterVendorID'] = 'none'
+    if not context['raw'].has_key('AdapterDeviceID'):
+        context['raw']['AdapterDeviceID'] = 'none'
+    if not context['raw'].has_key('StartupCrash'):
+        context['raw']['StartupCrash'] = 'none'
+    if not context['raw'].has_key('FlashProcessDump'):
+        context['raw']['FlashProcessDump'] = 'none'
+    if not context['raw'].has_key('MozCrashReason'):
+        context['raw']['MozCrashReason'] = 'none'
+    if not context['raw'].has_key('JavaStackTrace'):
+        context['raw']['JavaStackTrace'] = 'none'
+    if not context['raw'].has_key('URL'):
+        context['raw']['URL'] = 'none'
+    if not context['raw'].has_key('Email'):
+        context['raw']['Email'] = 'none'
+    if not context['raw'].has_key('TotalVirtualMemory'):
+        context['raw']['TotalVirtualMemory'] = 'none'
+    if not context['raw'].has_key('AvailableVirtualMemory'):
+        context['raw']['AvailableVirtualMemory'] = 'none'
+    if not context['raw'].has_key('AvailablePageFile'):
+        context['raw']['AvailablePageFile'] = 'none'
+    if not context['raw'].has_key('vailablePhysicalMemory'):
+        context['raw']['vailablePhysicalMemory'] = 'none'
+    if not context['raw'].has_key('AvailablePhysicalMemory'):
+        context['raw']['AvailablePhysicalMemory'] = 'none'
+    if not context['raw'].has_key('SystemMemoryUsePercentage'):
+        context['raw']['SystemMemoryUsePercentage'] = 'none'
+    if not context['raw'].has_key('OOMAllocationSize'):
+        context['raw']['OOMAllocationSize'] = 'none'
+    if not context['raw'].has_key('Accessibility'):
+        context['raw']['Accessibility'] = 'none'
+
 
     bugs_api = models.Bugs()
     hits = bugs_api.get(signatures=[context['report']['signature']])['hits']
@@ -1062,11 +1155,12 @@ def raw_data(request, crash_id, extension, name=None):
         raise NotImplementedError(extension)
 
     data = api.get(crash_id=crash_id, format=format, name=name)
+
     response = http.HttpResponse(content_type=content_type)
     if extension == 'json':
         response.write(json.dumps(data))
     else:
-        response.write(data)
+        response.write(data[0])
     return response
 
 
