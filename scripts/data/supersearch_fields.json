@@ -1384,6 +1384,25 @@
             "type": "string"
         }
     },
+    "ptype": {
+        "data_validation_type": "enum",
+        "default_value": null,
+        "form_field_choices": [
+            "renderer", "browser", "plugin", "gpu", "all"
+        ],
+        "has_full_version": false,
+        "in_database_name": "ptype",
+        "is_exposed": true,
+        "is_mandatory": false,
+        "is_returned": true,
+        "name": "ptype",
+        "namespace": "processed_crash",
+        "permissions_needed": [],
+        "query_type": "enum",
+        "storage_mapping": {
+            "type": "string"
+        }
+    },
     "processor_notes": {
         "data_validation_type": "enum",
         "default_value": null,
