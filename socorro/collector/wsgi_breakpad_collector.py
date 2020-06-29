@@ -77,10 +77,10 @@ class BreakpadCollectorBase(GenericCollectorBase):
         if (not self.accept_submitted_crash_id or 'uuid' not in raw_crash):
             crash_id = createNewOoid(current_timestamp)
             raw_crash.uuid = crash_id
-            self.logger.info('%s received', crash_id)
+            self.logger.info('dhy --- %s received', crash_id)
         else:
             crash_id = raw_crash.uuid
-            self.logger.info('%s received with existing crash_id:', crash_id)
+            self.logger.info('dhy --- %s received with existing crash_id:', crash_id)
 
         if ('legacy_processing' not in raw_crash
             or not self.accept_submitted_legacy_processing
@@ -134,7 +134,7 @@ class BreakpadCollectorBase(GenericCollectorBase):
         )
 
         # Return crash id to http client.
-        self.logger.info('%s accepted', crash_id)
+        self.logger.info('dhy --- %s accepted', crash_id)
         return "CrashID=%s%s\n" % (self.dump_id_prefix, crash_id)
 
 
@@ -150,26 +150,32 @@ class BreakpadCollector(BreakpadCollectorBase):
 
     #--------------------------------------------------------------------------
     def _get_throttler(self):
+        self.logger.info("dhy --- BreakpadCollector throttler")
         return self.config.throttler
 
     #--------------------------------------------------------------------------
     def _get_dump_field(self):
+        self.logger.info("dhy --- BreakpadCollector dump_field", self.config.collector.dump_field)
         return self.config.collector.dump_field
 
     #--------------------------------------------------------------------------
     def _get_dump_id_prefix(self):
+        self.logger.info("dhy --- BreakpadCollector dump_id_prefix", self.config.collector.dump_id_prefix)
         return self.config.collector.dump_id_prefix
 
     #--------------------------------------------------------------------------
     def _get_accept_submitted_legacy_processing(self):
+        self.logger.info("dhy --- BreakpadCollector accept_submitted_legacy_processing", self.config.collector.accept_submitted_legacy_processing)
         return self.config.collector.accept_submitted_legacy_processing
 
     #--------------------------------------------------------------------------
     def _get_checksum_method(self):
+        self.logger.info("dhy --- BreakpadCollector checksum_method", self.config.collector.checksum_method)
         return self.config.collector.checksum_method
 
     #--------------------------------------------------------------------------
     def _get_accept_submitted_crash_id(self):
+        self.logger.info("dhy --- BreakpadCollector accept_submitted_crash_id", self.config.collector.accept_submitted_crash_id)
         return self.config.collector.accept_submitted_crash_id
 
 
@@ -215,6 +221,7 @@ class BreakpadCollector2015(BreakpadCollectorBase):
 
     #--------------------------------------------------------------------------
     def _get_throttler(self):
+        self.logger.info("dhy --- BreakpadCollector2015 throttler")
         try:
             return self.config.throttler.throttler_instance
         except KeyError:
@@ -224,6 +231,7 @@ class BreakpadCollector2015(BreakpadCollectorBase):
 
     #--------------------------------------------------------------------------
     def _get_metrics(self):
+        self.logger.info("dhy --- BreakpadCollector2015 _get_metrics")
         try:
             return self.config.metrics.metrics_instance
         except KeyError:
@@ -234,11 +242,12 @@ class BreakpadCollector2015(BreakpadCollectorBase):
     #--------------------------------------------------------------------------
     def _get_crash_storage(self):
         try:
+            self.logger.info("dhy --- BreakpadCollector2015 storage_instance")
             return self.config.storage.storage_instance
         except KeyError:
             self.config.storage.storage_instance = \
                 self.config.storage.crashstorage_class(
                     self.config.storage
                 )
-
+            self.logger.info("dhy --- BreakpadCollector2015 _get_crash_storage ", self.config.storage)
             return self.config.storage.storage_instance

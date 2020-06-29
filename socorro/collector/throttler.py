@@ -200,14 +200,14 @@ class LegacyThrottler(RequiredConfig):
 
 
                 self.config.logger.debug(
-                  "deferring %s %s",
+                  "dhy -- deferring %s %s",
                   procname,
                   version
                 )
                 return DEFER, percentage
         else:  # we're accepting
             self.config.logger.debug(
-              "not throttled %s %s",
+              "dhy -- not throttled %s %s",
               raw_crash.ProductName,
               raw_crash.Version
             )
