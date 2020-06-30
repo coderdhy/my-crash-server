@@ -46,3 +46,4 @@ primaryCrashStore/
 processedCrashStore/
 /tags
 e2e-tests/.cache/
+crashes/
